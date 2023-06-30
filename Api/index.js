@@ -134,6 +134,8 @@ const server = app.listen(4040)
  const wss =  new ws.WebSocketServer({server})
 
  wss.on('connection' , (connection ,req)=>{
+
+  //read username and id fromt he cookie for this connection
  const cookies = req.headers.cookie;
 
  if(cookies){
@@ -144,19 +146,28 @@ if(tokenCookieString){
     jwt.verify(token,jwtSecret,{} , (err ,userData)=>{
       if(err) throw err
      const{userId , username}= userData;
-     connection.userId = userId;
+     connection.userId = userId;                                // it is reading the data from encrpted data
      connection.username = username;
     })
   }
 }
  }
 
+connection.on('message',(message)=>{
+const messageData = JSON.parse(message.toString());     // we are sending messgae to other id 
+const {recipient ,text} = messageData;            //- this contains from the front both id and txt messgae from form
+  if(recipient && text){
+   [... wss.clients].filter(c=> c.userId === recipient) 
+   .forEach(c=> c.send(JSON.stringify({text})))
+  }
+});
+
 //  note: - // this iterating over all the connected clients in a WebSocket server and executing an empty callback function for each client. 
       
       [...wss.clients].forEach(client=>{  
         client.send(JSON.stringify(
           {
-            online:[...wss.clients].map(c=> ({userId:c.userId,username:c.username}))
+            online:[...wss.clients].map(c=> ({userId:c.userId,username:c.username}))    // to client 
           }
         ))
       });  
