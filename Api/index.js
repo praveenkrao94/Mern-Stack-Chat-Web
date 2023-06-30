@@ -49,13 +49,15 @@ app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   try {
     const createdUser = await User.create({ username, password });
-    jwt.sign({ userId: createdUser._id }, jwtSecret, {}, (err, token) => {
+    jwt.sign({ userId: createdUser._id,username }, jwtSecret, {}, (err, token) => {
       if (err) {
         console.error('Failed to create JWT token:', err);
         res.status(500).json('Internal server error');
       } else {
         res.cookie('token', token).status(201).json({
-          _id:CreatedUser._id
+          id:createdUser._id,
+          
+        
         });
       }
     });
@@ -64,6 +66,27 @@ app.post('/register', async (req, res) => {
     res.status(500).json('Internal server error');
   }
 });
+
+
+
+// profile///
+
+app.get('/profile', (req,res)=>{
+   const token = req.cookies?.token;
+   if(token){
+    jwt.verify(token,jwtSecret,{} , (err,userData)=>{
+      if(err) throw err;
+      
+      res.json(userData)
+   })
+
+   }else {
+    res.status(401).json('No token')
+   }
+  
+})
+
+
 
 app.listen(4040, () => {
   console.log('Server started listening on port 4040');
