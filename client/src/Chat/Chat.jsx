@@ -50,14 +50,17 @@ function Chat() {
           <div
             key={userId}
             onClick={() => setSelectedUserId(userId)}
-            className={'border-b border-gray-100 py-2 pl-4 flex items-center gap-3 cursor-pointer ' + (userId === selectedUserId ? 'bg-gray-200' : '')}
+            className={'border-b border-gray-100  flex items-center gap-3 cursor-pointer ' + (userId === selectedUserId ? 'bg-gray-200' : '')}
           >
             {userId === selectedUserId &&(
               <div className='w-1 bg-blue-500 h-12' ></div>
             )}
+            <div className='flex gap-2 py-2 pl-4'>
             <Avatar username={onlinePeopleExcludingOurUser[userId]} userId={userId} />
             <span className='text-gray-800'>{onlinePeopleExcludingOurUser[userId]}</span>
           </div>
+            </div>
+            
         ))}
       </div>
       <div className='flex flex-col bg-blue-100 w-2/3 p-2'>
