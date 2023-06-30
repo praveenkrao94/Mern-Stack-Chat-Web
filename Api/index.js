@@ -127,6 +127,8 @@ app.get('/profile', (req,res)=>{
 
 const server = app.listen(4040)
 
+
+
 // create web socket server  -- install yarn add or npm i ws
 
  const wss =  new ws.WebSocketServer({server})
@@ -143,11 +145,32 @@ if(tokenCookieString){
       if(err) throw err
      const{userId , username}= userData;
      connection.userId = userId;
-     connection.usernmae = username;
+     connection.username = username;
     })
   }
 }
  }
-                  
+
+//  note: - // this iterating over all the connected clients in a WebSocket server and executing an empty callback function for each client. 
+      
+      [...wss.clients].forEach(client=>{  
+        client.send(JSON.stringify(
+          {
+            online:[...wss.clients].map(c=> ({userId:c.userId,username:c.username}))
+          }
+        ))
+      });  
+      
+
+
+
+
+
+
+
+// ---------- end ---------
+
+
+
 
  })
