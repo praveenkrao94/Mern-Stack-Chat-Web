@@ -12,6 +12,8 @@ const app = express();
 
 const User = require('./model/User');
 
+const ws = require('ws')
+
 require('dotenv').config();
 
 
@@ -119,8 +121,33 @@ app.get('/profile', (req,res)=>{
   
 })
 
+// -----------
 
 
-app.listen(4040, () => {
-  console.log('Server started listening on port 4040');
-});
+
+const server = app.listen(4040)
+
+// create web socket server  -- install yarn add or npm i ws
+
+ const wss =  new ws.WebSocketServer({server})
+
+ wss.on('connection' , (connection ,req)=>{
+ const cookies = req.headers.cookie;
+
+ if(cookies){
+const tokenCookieString =  cookies.split(';').find(str => str.startsWith('token='))     // this is to get token ='w1r'
+if(tokenCookieString){
+  const token = tokenCookieString.split('=')[1];  // this is to get just the token string
+  if(token){
+    jwt.verify(token,jwtSecret,{} , (err ,userData)=>{
+      if(err) throw err
+     const{userId , username}= userData;
+     connection.userId = userId;
+     connection.usernmae = username;
+    })
+  }
+}
+ }
+                  
+
+ })
